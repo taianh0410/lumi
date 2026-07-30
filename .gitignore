@@ -1,0 +1,24 @@
+# Secret files (Cực kỳ quan trọng)
+.env
+.env.*
+*.pem
+*.key
+keys/
+secrets/
+
+# Flutter/Dart
+.dart_tool/
+build/
+.pub-cache/
+.packages
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python (AI Engine)
+__pycache__/
+*.py[cod]
+.venv/
+venv/

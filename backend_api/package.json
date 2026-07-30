@@ -1,0 +1,30 @@
+{
+  "name": "lumi-backend-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "lint": "eslint .",
+    "emulators": "firebase emulators:start --config firebase.json"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.5.0",
+    "form-data": "^4.0.4",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.8.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.31.0",
+    "firebase-tools": "^14.15.1",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
+  }
+}
