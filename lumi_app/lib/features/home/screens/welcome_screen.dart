@@ -168,7 +168,7 @@ class _HeroSection extends StatelessWidget {
                 .fadeIn(delay: 100.ms, duration: 500.ms)
                 .slideY(begin: 0.2, end: 0),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Headline with gradient
             ShaderMask(
@@ -193,10 +193,10 @@ class _HeroSection extends StatelessWidget {
                 .fadeIn(delay: 200.ms, duration: 600.ms)
                 .slideY(begin: 0.25, end: 0),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Subtitle
-            const ConstrainedBox(
+            ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 640),
               child: Text(
                 'Trải nghiệm học tập thế hệ mới. Phân tích tài liệu chuyên sâu, giải đáp tức thì với công nghệ lõi tiên tiến. Đừng chỉ học, hãy làm chủ kiến thức.',
