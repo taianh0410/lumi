@@ -71,3 +71,7 @@ backend_api/data/
 
 # ─── Docs (internal only, not for public repo) ───────────────────────────────
 docs/
+
+# ─── Markdown files (except root README.md) ──────────────────────────────────
+lumi_app/README.md
+lumi_app/ios/**/*.md
