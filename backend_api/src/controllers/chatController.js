@@ -61,6 +61,8 @@ export async function sendMessage(req, res) {
     // 1. Lưu tin nhắn của user
     const userMessage = await Message.create({
       sessionId,
+      senderId: req.user?.uid,
+      groupId: session.classId || session._id,
       sender: 'user',
       content: String(content).trim(),
     });
@@ -88,6 +90,8 @@ export async function sendMessage(req, res) {
     // 3. Lưu tin nhắn của AI
     const aiMessage = await Message.create({
       sessionId,
+      senderId: req.user?.uid,
+      groupId: session.classId || session._id,
       sender: 'ai',
       content: aiText,
       metadata: aiMetadata,

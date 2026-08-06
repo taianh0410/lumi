@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/network/api_client.dart';
 
 const _tokenKey = 'auth_token';
 const _userIdKey = 'auth_user_id';
@@ -32,14 +33,7 @@ class AuthUser {
 }
 
 class AuthService {
-  AuthService()
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: AppConstants.backendBaseUrl,
-            connectTimeout: const Duration(seconds: 30),
-            receiveTimeout: const Duration(seconds: 30),
-          ),
-        );
+  AuthService() : _dio = ApiClient.instance.dio;
 
   final Dio _dio;
 

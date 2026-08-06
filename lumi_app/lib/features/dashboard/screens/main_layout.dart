@@ -1,70 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../../chat/presentation/socratic_chat_screen.dart';
-
-// ── Nav destinations ──────────────────────────────────────────────────────────
+import '../../classes/screens/class_screen.dart';
+import '../../friends/screens/friend_screen.dart';
+import '../../groups/screens/group_screen.dart';
 
 enum _NavItem {
-  chat('Socratic Chat', Icons.chat_bubble_outline, Icons.chat_bubble),
-  classes('Lớp học', Icons.school_outlined, Icons.school),
-  groups('Nhóm học tập', Icons.group_outlined, Icons.group),
-  friends('Bạn bè', Icons.people_outline, Icons.people);
+  chat('/dashboard', 'Socratic Chat', Icons.chat_bubble_outline, Icons.chat_bubble),
+  classes('/classes', 'Lớp học', Icons.school_outlined, Icons.school),
+  groups('/groups', 'Nhóm học tập', Icons.group_work, Icons.group_work),
+  friends('/friends', 'Bạn bè', Icons.person_add, Icons.person_add_alt_1);
 
-  const _NavItem(this.label, this.icon, this.activeIcon);
+  const _NavItem(this.route, this.label, this.icon, this.activeIcon);
+
+  final String route;
   final String label;
   final IconData icon;
   final IconData activeIcon;
 }
 
-// ── Main Layout ───────────────────────────────────────────────────────────────
+class MainLayout extends ConsumerWidget {
+  const MainLayout({super.key, required this.currentPath});
 
-class MainLayout extends ConsumerStatefulWidget {
-  const MainLayout({super.key});
+  final String currentPath;
 
-  @override
-  ConsumerState<MainLayout> createState() => _MainLayoutState();
-}
-
-class _MainLayoutState extends ConsumerState<MainLayout> {
-  _NavItem _selected = _NavItem.chat;
+  _NavItem get _selectedItem {
+    for (final item in _NavItem.values) {
+      if (item.route == currentPath) {
+        return item;
+      }
+    }
+    return _NavItem.chat;
+  }
 
   Widget _buildBody() {
-    switch (_selected) {
+    switch (_selectedItem) {
       case _NavItem.chat:
         return const SocraticChatScreen();
-      case _NavItem.classes:
       case _NavItem.groups:
+        return const GroupScreen();
       case _NavItem.friends:
-        return _ComingSoon(label: _selected.label);
+        return const FriendScreen();
+      case _NavItem.classes:
+        return const ClassScreen();
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).user;
+    final selected = _selectedItem;
     final isWide = MediaQuery.of(context).size.width >= 720;
 
-    // Wide (web/tablet): NavigationRail + body side by side — no AppBar needed
-    // Narrow (mobile): AppBar + NavigationDrawer
-    return isWide ? _WideLayout(
-      selected: _selected,
-      user: user,
-      body: _buildBody(),
-      onSelect: (item) => setState(() => _selected = item),
-      onLogout: () => ref.read(authProvider.notifier).logout(),
-    ) : _NarrowLayout(
-      selected: _selected,
-      user: user,
-      body: _buildBody(),
-      onSelect: (item) => setState(() => _selected = item),
-      onLogout: () => ref.read(authProvider.notifier).logout(),
-    );
+    return isWide
+        ? _WideLayout(
+            selected: selected,
+            user: user,
+            body: _buildBody(),
+            onSelect: (item) {
+              if (item.route != currentPath) {
+                context.go(item.route);
+              }
+            },
+            onLogout: () => ref.read(authProvider.notifier).logout(),
+          )
+        : _NarrowLayout(
+            selected: selected,
+            user: user,
+            body: _buildBody(),
+            onSelect: (item) {
+              if (item.route != currentPath) {
+                context.go(item.route);
+              }
+            },
+            onLogout: () => ref.read(authProvider.notifier).logout(),
+          );
   }
 }
-
-// ── Wide layout (Web / Tablet) ────────────────────────────────────────────────
 
 class _WideLayout extends StatelessWidget {
   const _WideLayout({
@@ -86,46 +101,41 @@ class _WideLayout extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          // ── Sidebar ──────────────────────────────────────────────────────
           Container(
             width: 220,
             color: const Color(0xFF0A192F),
             child: Column(
               children: [
-                // Logo
                 const SizedBox(height: 32),
                 const _Logo(),
                 const SizedBox(height: 32),
                 const Divider(color: Colors.white12, indent: 16, endIndent: 16),
                 const SizedBox(height: 8),
-                // Nav items
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: _NavItem.values
-                        .map((item) => _SidebarItem(
-                              item: item,
-                              isSelected: item == selected,
-                              onTap: () => onSelect(item),
-                            ))
+                        .map(
+                          (item) => _SidebarItem(
+                            item: item,
+                            isSelected: item == selected,
+                            onTap: () => onSelect(item),
+                          ),
+                        )
                         .toList(),
                   ),
                 ),
-                // User + logout
                 _UserTile(user: user, onLogout: onLogout),
                 const SizedBox(height: 16),
               ],
             ),
           ),
-          // ── Body ─────────────────────────────────────────────────────────
           Expanded(child: body),
         ],
       ),
     );
   }
 }
-
-// ── Narrow layout (Mobile) ────────────────────────────────────────────────────
 
 class _NarrowLayout extends StatelessWidget {
   const _NarrowLayout({
@@ -167,14 +177,16 @@ class _NarrowLayout extends StatelessWidget {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: _NavItem.values
-                      .map((item) => _SidebarItem(
-                            item: item,
-                            isSelected: item == selected,
-                            onTap: () {
-                              onSelect(item);
-                              Navigator.of(context).pop();
-                            },
-                          ))
+                      .map(
+                        (item) => _SidebarItem(
+                          item: item,
+                          isSelected: item == selected,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            onSelect(item);
+                          },
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -188,8 +200,6 @@ class _NarrowLayout extends StatelessWidget {
     );
   }
 }
-
-// ── Sidebar item ──────────────────────────────────────────────────────────────
 
 class _SidebarItem extends StatelessWidget {
   const _SidebarItem({
@@ -207,9 +217,7 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       child: Material(
-        color: isSelected
-            ? const Color(0xFF1E3A5F)
-            : Colors.transparent,
+        color: isSelected ? const Color(0xFF1E3A5F) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
@@ -221,19 +229,18 @@ class _SidebarItem extends StatelessWidget {
                 Icon(
                   isSelected ? item.activeIcon : item.icon,
                   size: 20,
-                  color: isSelected
-                      ? const Color(0xFF22D3EE)
-                      : Colors.white54,
+                  color: isSelected ? const Color(0xFF22D3EE) : Colors.white54,
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  item.label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected
-                        ? FontWeight.w700
-                        : FontWeight.w400,
-                    color: isSelected ? Colors.white : Colors.white70,
+                Expanded(
+                  child: Text(
+                    item.label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                      color: isSelected ? Colors.white : Colors.white70,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -244,8 +251,6 @@ class _SidebarItem extends StatelessWidget {
     );
   }
 }
-
-// ── User tile ─────────────────────────────────────────────────────────────────
 
 class _UserTile extends StatelessWidget {
   const _UserTile({required this.user, required this.onLogout});
@@ -274,7 +279,9 @@ class _UserTile extends StatelessWidget {
               child: Text(
                 username.isNotEmpty ? username[0].toUpperCase() : '?',
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFF0A192F)),
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0A192F),
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -283,16 +290,20 @@ class _UserTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(username,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    username,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   if (role.isNotEmpty)
-                    Text(role,
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 11)),
+                    Text(
+                      role,
+                      style: const TextStyle(color: Colors.white38, fontSize: 11),
+                    ),
                 ],
               ),
             ),
@@ -307,8 +318,6 @@ class _UserTile extends StatelessWidget {
     );
   }
 }
-
-// ── Avatar button (narrow AppBar) ─────────────────────────────────────────────
 
 class _AvatarButton extends StatelessWidget {
   const _AvatarButton({required this.user, required this.onLogout});
@@ -327,15 +336,16 @@ class _AvatarButton extends StatelessWidget {
         child: Text(
           username.isNotEmpty ? username[0].toUpperCase() : '?',
           style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-              color: Color(0xFF0A192F)),
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+            color: Color(0xFF0A192F),
+          ),
         ),
       ),
       itemBuilder: (_) => [
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'logout',
-          child: const Row(
+          child: Row(
             children: [
               Icon(Icons.logout, size: 18),
               SizedBox(width: 8),
@@ -344,15 +354,18 @@ class _AvatarButton extends StatelessWidget {
           ),
         ),
       ],
-      onSelected: (v) { if (v == 'logout') onLogout(); },
+      onSelected: (value) {
+        if (value == 'logout') {
+          onLogout();
+        }
+      },
     );
   }
 }
 
-// ── Logo ──────────────────────────────────────────────────────────────────────
-
 class _Logo extends StatelessWidget {
   const _Logo({this.horizontal = false});
+
   final bool horizontal;
 
   @override
@@ -374,6 +387,7 @@ class _Logo extends StatelessWidget {
         children: [icon, SizedBox(width: 8), label],
       );
     }
+
     return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [icon, SizedBox(height: 6), label],
@@ -381,10 +395,9 @@ class _Logo extends StatelessWidget {
   }
 }
 
-// ── Coming soon placeholder ───────────────────────────────────────────────────
-
 class _ComingSoon extends StatelessWidget {
   const _ComingSoon({required this.label});
+
   final String label;
 
   @override
@@ -396,11 +409,12 @@ class _ComingSoon extends StatelessWidget {
           const Icon(Icons.construction, size: 56, color: Color(0xFF94A3B8)),
           const SizedBox(height: 16),
           Text(
-            '$label — Tính năng đang phát triển',
+            '$label - Tính năng đang phát triển',
             style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF64748B)),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
+            ),
           ),
         ],
       ),

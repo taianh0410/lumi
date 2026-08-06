@@ -1,24 +1,73 @@
-# Secret files (Cực kỳ quan trọng)
+# ─── Secrets ────────────────────────────────────────────────────────────────
 .env
 .env.*
 *.pem
 *.key
 keys/
 secrets/
+**/google-services.json
+**/GoogleService-Info.plist
+**/serviceAccountKey.json
 
-# Flutter/Dart
+# ─── Node.js ─────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.npm/
+
+# ─── Python / AI Engine ──────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+*.dist-info/
+
+# AI Engine generated data (ChromaDB vector store, SQLite DB)
+ai_engine/data/
+
+# ─── Flutter / Dart ───────────────────────────────────────────────────────────
 .dart_tool/
 build/
 .pub-cache/
 .packages
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+lumi_app/lumi_app.iml
 
-# Node.js
-node_modules/
-npm-debug.log
-yarn-error.log
+# ─── Generated build artifacts ───────────────────────────────────────────────
+*.class
+*.o
+*.obj
+*.dll
+*.exe
+*.so
+*.dylib
 
-# Python (AI Engine)
-__pycache__/
-*.py[cod]
-.venv/
-venv/
+# ─── IDE / Editor ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Temporary / OS ──────────────────────────────────────────────────────────
+*.tmp
+*.temp
+.cache/
+.tmp/
+
+# ─── Data files that should never be committed ───────────────────────────────
+backend_api/data/
+
+# ─── Docs (internal only, not for public repo) ───────────────────────────────
+docs/

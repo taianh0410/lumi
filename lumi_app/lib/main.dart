@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/routes/app_router.dart';
+import 'core/network/api_client.dart';
+import 'features/auth/providers/auth_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +21,14 @@ class LumiApp extends ConsumerStatefulWidget {
 
 class _LumiAppState extends ConsumerState<LumiApp> {
   late final router = buildAppRouter(ProviderScope.containerOf(context));
+
+  @override
+  void initState() {
+    super.initState();
+    ApiClient.instance.setUnauthorizedHandler(() async {
+      await ref.read(authProvider.notifier).logout();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

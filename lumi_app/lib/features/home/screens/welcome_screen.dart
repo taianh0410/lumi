@@ -15,7 +15,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: const Color(0xFF0F172A),
       body: Stack(
         children: [
           // Ambient glow background
@@ -109,8 +109,8 @@ class _Navbar extends StatelessWidget {
             TextButton(
               onPressed: () => context.push('/login'),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.white70,
-                textStyle: const TextStyle(fontSize: 15),
+                foregroundColor: Colors.white,
+                textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
               child: const Text('Đăng nhập'),
             ),
@@ -119,12 +119,13 @@ class _Navbar extends StatelessWidget {
               onPressed: () => context.push('/register'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _kPrimary,
-                foregroundColor: _kBg,
+                foregroundColor: const Color(0xFF0F172A),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 textStyle: const TextStyle(
                     fontSize: 15, fontWeight: FontWeight.w700),
+                elevation: 0,
               ),
               child: const Text('Đăng ký'),
             ),
@@ -170,13 +171,9 @@ class _HeroSection extends StatelessWidget {
 
             SizedBox(height: 32),
 
-            // Headline with gradient
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Colors.white, _kPrimary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
+            // Headline — plain white, no ShaderMask
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
               child: const Text(
                 'LUMI AI — Khởi nguồn\ntri thức vô tận',
                 textAlign: TextAlign.center,
@@ -197,13 +194,13 @@ class _HeroSection extends StatelessWidget {
 
             // Subtitle
             ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 640),
-              child: Text(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: const Text(
                 'Trải nghiệm học tập thế hệ mới. Phân tích tài liệu chuyên sâu, giải đáp tức thì với công nghệ lõi tiên tiến. Đừng chỉ học, hãy làm chủ kiến thức.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color(0xFF94A3B8),
-                  fontSize: 17,
+                  color: Color(0xFFCBD5E1),
+                  fontSize: 18,
                   height: 1.75,
                 ),
               ),
